@@ -201,7 +201,7 @@ function App() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            FiFuFaaaa🖐🏻
+            FiFuFa🖐🏻
           </motion.h1>
           <motion.div
             className="inline-block px-6 py-2 rounded-full text-lg font-semibold"
