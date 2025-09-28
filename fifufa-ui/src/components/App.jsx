@@ -1,7 +1,97 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Translations
+const translations = {
+  en: {
+    inputLabel: "What's on your mind? 🤔",
+    inputPlaceholder: "Search ninja, le sserafim, einstein or else..",
+    randomButton: "Generate random topic",
+    discoverButton: "Discover Amazing Facts 🚀",
+    generatingText: "Generating Magic...",
+    resultsTitle: 'Amazing Facts about "{topic}"🎉',
+    moreButton: "More Facts ✨",
+    loadingMore: "Loading More...",
+    errorEmpty: "Please enter a topic first!",
+    errorTooShort: "Topic too short! Please enter at least 2 characters.",
+    errorTooLong: "Topic too long! Please keep it under 50 characters.",
+    errorFetchFailed: "🙏 Sorry, we couldn't fetch fun facts right now.",
+    errorConnectivity: "🔡 Possible reason: connectivity issue or API credit limit reached.",
+    errorTryAgain: "💡 Please try again in a few minutes!",
+    errorRateLimit: "⏰ Too many requests! Please wait a moment and try again.",
+    errorServer: "🔧 Server issue detected. Try a different topic or wait a few minutes.",
+    errorMoreFacts: "🙏 Sorry, couldn't fetch more facts.",
+    errorRandomTopic: "Failed to get random topic. Please try again.",
+    createdBy: "Created by Muhammad Iqbal Rasyid 👨🏻‍💻",
+    hostedBy: "Hosted by:",
+    collaboratedWith: "Collaborated with:",
+    aiPoweredBy: "AI Powered by:",
+    disclaimer: "⚠️ AI-generated content may not be 100% accurate. Please verify facts.",
+    charactersText: "characters"
+  },
+  id: {
+    inputLabel: "Lagi mau cari tau apa? 🤔",
+    inputPlaceholder: "Cari rendang, borobudur, raisa, atau lainnya..",
+    randomButton: "Buat topik acak",
+    discoverButton: "Temukan Fakta Menarik 🚀",
+    generatingText: "Membuat Keajaiban...",
+    resultsTitle: 'Fakta Menarik tentang "{topic}"🎉',
+    moreButton: "Fakta Lainnya ✨",
+    loadingMore: "Memuat Lebih Banyak...",
+    errorEmpty: "Silakan masukkan topik terlebih dahulu!",
+    errorTooShort: "Topik terlalu pendek! Masukkan minimal 2 karakter.",
+    errorTooLong: "Topik terlalu panjang! Maksimal 50 karakter.",
+    errorFetchFailed: "🙏 Maaf, kami tidak bisa mengambil fakta menarik sekarang.",
+    errorConnectivity: "🔡 Kemungkinan penyebab: masalah koneksi atau batas kredit API tercapai.",
+    errorTryAgain: "💡 Silakan coba lagi dalam beberapa menit!",
+    errorRateLimit: "⏰ Terlalu banyak permintaan! Harap tunggu sebentar dan coba lagi.",
+    errorServer: "🔧 Masalah server terdeteksi. Coba topik lain atau tunggu beberapa menit.",
+    errorMoreFacts: "🙏 Maaf, tidak bisa mengambil fakta lainnya.",
+    errorRandomTopic: "Gagal mendapatkan topik acak. Silakan coba lagi.",
+    createdBy: "Dibuat oleh Muhammad Iqbal Rasyid 👨🏻‍💻",
+    hostedBy: "Diselenggarakan oleh:",
+    collaboratedWith: "Berkolaborasi dengan:",
+    aiPoweredBy: "Didukung oleh AI:",
+    disclaimer: "⚠️ Konten yang dihasilkan AI mungkin tidak 100% akurat. Harap verifikasi fakta.",
+    charactersText: "karakter"
+  }
+};
+
+// Language Toggle Component
+const LanguageToggle = ({ currentLanguage, onLanguageChange, colors }) => {
+  const languages = [
+    { code: 'en', label: 'English'},
+    { code: 'id', label: 'Indonesian'}
+  ];
+
+  return (
+    <div className="flex items-center gap-1 bg-white rounded-full p-1 shadow-lg border">
+      {languages.map((lang) => (
+        <motion.button
+          key={lang.code}
+          onClick={() => onLanguageChange(lang.code)}
+          className={`px-3 py-2 rounded-full text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
+            currentLanguage === lang.code 
+              ? 'text-white shadow-md' 
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+          style={{
+            backgroundColor: currentLanguage === lang.code ? colors.navy : 'transparent'
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          type="button"
+          aria-label={`Switch to ${lang.label}`}
+        >
+          <span>{lang.label}</span>
+        </motion.button>
+      ))}
+    </div>
+  );
+};
+
 function App() {
+  const [language, setLanguage] = useState("en");
   const [topic, setTopic] = useState("");
   const [facts, setFacts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -9,29 +99,45 @@ function App() {
   const [loadingRandomWord, setLoadingRandomWord] = useState(false);
   const [error, setError] = useState("");
 
+  // Translation helper
+  const t = (key, variables = {}) => {
+    let text = translations[language]?.[key] || translations['en'][key] || key;
+    Object.keys(variables).forEach(variable => {
+      text = text.replace(`{${variable}}`, variables[variable]);
+    });
+    return text;
+  };
+
+  // Load Google Fonts
   useEffect(() => {
     const link = document.createElement("link");
-    link.href =
-      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap";
+    link.href = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap";
     link.rel = "stylesheet";
     document.head.appendChild(link);
     return () => document.head.removeChild(link);
   }, []);
+
+  // Clear topic when language changes
+  useEffect(() => {
+    setTopic("");
+    setFacts([]);
+    setError("");
+  }, [language]);
 
   const fetchFacts = async () => {
     const sanitizedTopic = topic.trim();
 
     // Input validation
     if (!sanitizedTopic) {
-      setError("Please enter a topic first!");
+      setError(t("errorEmpty"));
       return;
     }
     if (sanitizedTopic.length < 2) {
-      setError("Topic too short! Please enter at least 2 characters.");
+      setError(t("errorTooShort"));
       return;
     }
     if (sanitizedTopic.length > 50) {
-      setError("Topic too long! Please keep it under 50 characters.");
+      setError(t("errorTooLong"));
       return;
     }
 
@@ -43,7 +149,10 @@ function App() {
       const response = await fetch("http://localhost:5000/api/facts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic: sanitizedTopic }),
+        body: JSON.stringify({ 
+          topic: sanitizedTopic, 
+          language: language 
+        }),
       });
 
       const data = await response.json();
@@ -63,23 +172,15 @@ function App() {
       setFacts(cleanFacts);
     } catch (error) {
       console.error(error);
-      if (
-        error.message.includes("429") ||
-        error.message.includes("Too many requests")
-      ) {
-        setFacts(["⏰ Too many requests! Please wait a moment and try again."]);
-      } else if (
-        error.message.includes("500") ||
-        error.message.includes("Something went wrong")
-      ) {
-        setFacts([
-          "🔧 Server issue detected. Try a different topic or wait a few minutes.",
-        ]);
+      if (error.message.includes("429") || error.message.includes("Too many requests")) {
+        setFacts([t("errorRateLimit")]);
+      } else if (error.message.includes("500") || error.message.includes("Something went wrong")) {
+        setFacts([t("errorServer")]);
       } else {
         setFacts([
-          "🙏 Sorry, we couldn't fetch fun facts right now.",
-          "📡 Possible reason: connectivity issue or API credit limit reached.",
-          "💡 Please try again in a few minutes!",
+          t("errorFetchFailed"),
+          t("errorConnectivity"),
+          t("errorTryAgain"),
         ]);
       }
     } finally {
@@ -94,7 +195,11 @@ function App() {
       const response = await fetch("http://localhost:5000/api/facts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, more: true }),
+        body: JSON.stringify({ 
+          topic, 
+          language: language, 
+          more: true 
+        }),
       });
 
       const data = await response.json();
@@ -114,7 +219,7 @@ function App() {
       setFacts((prev) => [...prev, ...cleanFacts]);
     } catch (error) {
       console.error(error);
-      setFacts((prev) => [...prev, "🙏 Sorry, couldn't fetch more facts."]);
+      setFacts((prev) => [...prev, t("errorMoreFacts")]);
     } finally {
       setLoadingMore(false);
     }
@@ -123,7 +228,7 @@ function App() {
   const getRandomWord = async () => {
     setLoadingRandomWord(true);
     try {
-      const response = await fetch("http://localhost:5000/api/random-words");
+      const response = await fetch(`http://localhost:5000/api/random-words?language=${language}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -131,13 +236,11 @@ function App() {
       }
 
       setTopic(data.word);
-      setError(""); // Clear any existing errors
-      console.log(
-        `Random word: ${data.word}, ${data.remaining} remaining in cache`
-      );
+      setError("");
+      console.log(`Random word [${language}]: ${data.word}, ${data.remaining} remaining in cache`);
     } catch (error) {
       console.error("Failed to get random word:", error);
-      setError("Failed to get random topic. Please try again.");
+      setError(t("errorRandomTopic"));
     } finally {
       setLoadingRandomWord(false);
     }
@@ -223,6 +326,15 @@ function App() {
         />
       </div>
 
+      {/* Language Toggle - Top Right */}
+      <div className="absolute top-6 right-6 z-20">
+        <LanguageToggle 
+          currentLanguage={language} 
+          onLanguageChange={setLanguage} 
+          colors={colors} 
+        />
+      </div>
+
       <header className="relative z-10 pt-12 pb-8 text-center px-4 sm:px-6 md:px-8 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -276,7 +388,7 @@ function App() {
                 style={{ color: colors.navy }}
                 htmlFor="topic-input"
               >
-                What's on your mind? 🤔
+                {t("inputLabel")}
               </label>
 
               {/* Error Message */}
@@ -298,7 +410,7 @@ function App() {
                 <motion.input
                   id="topic-input"
                   type="text"
-                  placeholder="Search ninja, batik, le sserafim, or else.."
+                  placeholder={t("inputPlaceholder")}
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   onKeyPress={handleKeyPress}
@@ -329,14 +441,12 @@ function App() {
                   disabled={loadingRandomWord}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-xl font-bold transition-all duration-300 border-2 disabled:opacity-70 flex items-center justify-center"
                   style={{
-                    backgroundColor: loadingRandomWord
-                      ? "#f3f4f6"
-                      : "transparent",
+                    backgroundColor: loadingRandomWord ? "#f3f4f6" : "transparent",
                     color: colors.amber,
                     borderColor: colors.amber,
                   }}
-                  title="Get random topic"
-                  aria-label="Generate random topic"
+                  title={t("randomButton")}
+                  aria-label={t("randomButton")}
                   type="button"
                 >
                   {loadingRandomWord ? (
@@ -359,9 +469,10 @@ function App() {
 
               {/* Character Count */}
               <div className="mt-2 text-right text-xs text-gray-500">
-                {topic.length}/50 characters
+                {topic.length}/50 {t("charactersText")}
               </div>
             </motion.div>
+            
             <motion.button
               whileTap={{ scale: 0.95 }}
               whileHover={{ scale: 1.02, y: -2 }}
@@ -395,10 +506,10 @@ function App() {
                     >
                       ⭐
                     </motion.div>
-                    Generating Magic...
+                    {t("generatingText")}
                   </motion.div>
                 ) : (
-                  "Discover Amazing Facts 🚀"
+                  t("discoverButton")
                 )}
               </span>
             </motion.button>
@@ -408,7 +519,7 @@ function App() {
         <AnimatePresence>
           {facts.length > 0 && (
             <motion.div
-              className="w-[100%] md:w-[95%] xl:w-[60%] mt-5 max-w-screen relative"
+              className="w-[100%] md:w-[85%] lg:w-[65%] xl:w-[60%] mt-5 max-w-screen relative"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -30 }}
@@ -428,7 +539,7 @@ function App() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Amazing Facts about "{topic}"🎉
+                  {t("resultsTitle", { topic })}
                 </motion.h2>
                 <div className="space-y-4">
                   {facts.map((fact, idx) => (
@@ -481,7 +592,7 @@ function App() {
                   ))}
                 </div>
 
-                {/* Tombol More - hanya tampil jika facts <= 5 */}
+                {/* More Button - only show if facts <= 5 */}
                 {facts.length <= 5 && facts.length > 0 && (
                   <motion.div
                     className="mt-6 text-center"
@@ -522,10 +633,10 @@ function App() {
                             >
                               ⚡
                             </motion.div>
-                            Loading More...
+                            {t("loadingMore")}
                           </motion.div>
                         ) : (
-                          "More Facts ✨"
+                          t("moreButton")
                         )}
                       </span>
                     </motion.button>
@@ -547,8 +658,7 @@ function App() {
                     className="text-sm text-center font-medium"
                     style={{ color: colors.navy }}
                   >
-                    ⚠️ AI-generated content may not be 100% accurate. Please
-                    verify facts.
+                    {t("disclaimer")}
                   </p>
                 </motion.div>
               </div>
@@ -563,8 +673,9 @@ function App() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
           className="space-y-6"
+          key={language} // Re-animate when language changes
         >
-          {/* Creator Credit with Instagram Link */}
+          {/* Creator Credit */}
           <motion.a
             href="https://otachiking.my.canva.site/"
             target="_blank"
@@ -583,7 +694,7 @@ function App() {
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            Created by Muhammad Iqbal Rasyid 👨🏻‍💻
+            {t("createdBy")}
           </motion.a>
 
           {/* Logos & Appreciation Section */}
@@ -604,7 +715,7 @@ function App() {
                   style={{ color: colors.navy }}
                   className="text-sm font-medium"
                 >
-                  Program of:
+                  {t("hostedBy")}
                 </span>
                 <a
                   href="https://www.instagram.com/hacktiv8id/"
@@ -637,7 +748,7 @@ function App() {
                   style={{ color: colors.navy }}
                   className="text-sm font-medium"
                 >
-                  Collaborated with:
+                  {t("collaboratedWith")}
                 </span>
                 <a
                   href="https://skills.yourlearning.ibm.com/"
@@ -667,7 +778,7 @@ function App() {
                   style={{ color: colors.navy }}
                   className="text-sm font-medium"
                 >
-                  AI Powered by:
+                  {t("aiPoweredBy")}
                 </span>
                 <a
                   href="https://replicate.com/ibm-granite/granite-3.3-8b-instruct"
