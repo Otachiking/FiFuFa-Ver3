@@ -20,7 +20,7 @@ function App() {
 
   const fetchFacts = async () => {
     const sanitizedTopic = topic.trim();
-    
+
     // Input validation
     if (!sanitizedTopic) {
       setError("Please enter a topic first!");
@@ -34,24 +34,24 @@ function App() {
       setError("Topic too long! Please keep it under 50 characters.");
       return;
     }
-    
+
     setError("");
     setLoading(true);
     setFacts([]);
-    
+
     try {
       const response = await fetch("http://localhost:5000/api/facts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic: sanitizedTopic }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch facts");
       }
-      
+
       let cleanFacts = [];
       if (Array.isArray(data.facts)) cleanFacts = data.facts;
       else if (typeof data.facts === "string") {
@@ -63,10 +63,18 @@ function App() {
       setFacts(cleanFacts);
     } catch (error) {
       console.error(error);
-      if (error.message.includes("429") || error.message.includes("Too many requests")) {
+      if (
+        error.message.includes("429") ||
+        error.message.includes("Too many requests")
+      ) {
         setFacts(["⏰ Too many requests! Please wait a moment and try again."]);
-      } else if (error.message.includes("500") || error.message.includes("Something went wrong")) {
-        setFacts(["🔧 Server issue detected. Try a different topic or wait a few minutes."]);
+      } else if (
+        error.message.includes("500") ||
+        error.message.includes("Something went wrong")
+      ) {
+        setFacts([
+          "🔧 Server issue detected. Try a different topic or wait a few minutes.",
+        ]);
       } else {
         setFacts([
           "🙏 Sorry, we couldn't fetch fun facts right now.",
@@ -88,13 +96,13 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, more: true }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch more facts");
       }
-      
+
       let cleanFacts = [];
       if (Array.isArray(data.facts)) cleanFacts = data.facts;
       else if (typeof data.facts === "string") {
@@ -103,10 +111,10 @@ function App() {
           .map((s) => s.trim())
           .filter((s) => s.length > 0);
       }
-      setFacts(prev => [...prev, ...cleanFacts]);
+      setFacts((prev) => [...prev, ...cleanFacts]);
     } catch (error) {
       console.error(error);
-      setFacts(prev => [...prev, "🙏 Sorry, couldn't fetch more facts."]);
+      setFacts((prev) => [...prev, "🙏 Sorry, couldn't fetch more facts."]);
     } finally {
       setLoadingMore(false);
     }
@@ -117,14 +125,16 @@ function App() {
     try {
       const response = await fetch("http://localhost:5000/api/random-words");
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to get random word");
       }
-      
+
       setTopic(data.word);
       setError(""); // Clear any existing errors
-      console.log(`Random word: ${data.word}, ${data.remaining} remaining in cache`);
+      console.log(
+        `Random word: ${data.word}, ${data.remaining} remaining in cache`
+      );
     } catch (error) {
       console.error("Failed to get random word:", error);
       setError("Failed to get random topic. Please try again.");
@@ -219,9 +229,9 @@ function App() {
         </motion.div>
       </header>
 
-      <main className="relative z-10 flex flex-col items-center px-4 sm:px-6 md:px-8 lg:px-12 pb-8">
+      <main className="relative z-10 flex flex-col items-center pb-0">
         <motion.div
-          className="relative w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mb-8"
+          className="relative w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mb-2"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -242,7 +252,7 @@ function App() {
               >
                 What's on your mind? 🤔
               </label>
-              
+
               {/* Error Message */}
               {error && (
                 <motion.div
@@ -255,7 +265,7 @@ function App() {
                   {error}
                 </motion.div>
               )}
-              
+
               {/* Input with Random Button Inside */}
               <div className="relative">
                 <motion.input
@@ -274,14 +284,16 @@ function App() {
                   whileFocus={{
                     borderColor: error ? "#ef4444" : colors.primary,
                     scale: 1.02,
-                    boxShadow: `0 0 0 4px ${error ? "#ef4444" : colors.primary}1A`,
+                    boxShadow: `0 0 0 4px ${
+                      error ? "#ef4444" : colors.primary
+                    }1A`,
                   }}
                   transition={{ duration: 0.2 }}
                   maxLength={50}
                   aria-describedby={error ? "topic-error" : undefined}
                   aria-invalid={error ? "true" : "false"}
                 />
-                
+
                 {/* Random Button Inside Input */}
                 <motion.button
                   whileTap={{ scale: 0.9 }}
@@ -290,7 +302,9 @@ function App() {
                   disabled={loadingRandomWord}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-xl font-bold transition-all duration-300 border-2 disabled:opacity-70 flex items-center justify-center"
                   style={{
-                    backgroundColor: loadingRandomWord ? "#f3f4f6" : "transparent",
+                    backgroundColor: loadingRandomWord
+                      ? "#f3f4f6"
+                      : "transparent",
                     color: colors.primary,
                     borderColor: colors.primary,
                   }}
@@ -301,7 +315,11 @@ function App() {
                   {loadingRandomWord ? (
                     <motion.div
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                       aria-hidden="true"
                     >
                       🎲
@@ -311,7 +329,7 @@ function App() {
                   )}
                 </motion.button>
               </div>
-              
+
               {/* Character Count */}
               <div className="mt-2 text-right text-xs text-gray-500">
                 {topic.length}/50 characters
@@ -348,7 +366,7 @@ function App() {
                         ease: "linear",
                       }}
                     >
-                    𖦹
+                      𖦹
                     </motion.div>
                     Generating Magic...
                   </motion.div>
@@ -425,10 +443,10 @@ function App() {
                     </motion.div>
                   ))}
                 </div>
-                
+
                 {/* Tombol More - hanya tampil jika facts <= 5 */}
                 {facts.length <= 5 && facts.length > 0 && (
-                  <motion.div 
+                  <motion.div
                     className="mt-6 text-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -476,37 +494,135 @@ function App() {
                     </motion.button>
                   </motion.div>
                 )}
+
+                {/* AI Disclaimer */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                  className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200"
+                >
+                  <p className="text-sm text-amber-800 text-center font-medium">
+                    ⚠️ AI-generated content may not be 100% accurate. Please
+                    verify facts.
+                  </p>
+                </motion.div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      <footer className="relative z-10 mt-auto py-8 text-center px-4 sm:px-6 md:px-8 lg:px-12">
+      <footer className="relative z-10 mt-4 py-8 text-center lg:pt-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="space-y-3"
+          className="space-y-6"
         >
-          <motion.p
-            className="text-white/80 text-sm font-medium"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            Built with 💜 using React, Tailwind & Framer Motion
-          </motion.p>
-          <motion.div
-            className="inline-block px-4 py-2 rounded-full text-sm font-semibold"
+          {/* Creator Credit with Instagram Link */}
+          <motion.a
+            href="https://instagram.com/otachiking"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer"
             style={{
               backgroundColor: colors.yellow,
               color: colors.primary,
               boxShadow: `0 4px 15px ${colors.yellow}33`,
             }}
-            whileHover={{ scale: 1.1, y: -2 }}
+            whileHover={{
+              scale: 1.1,
+              y: -2,
+              boxShadow: `0 6px 20px ${colors.yellow}4D`,
+            }}
+            whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            Created by Muhammad Iqbal Rasyid ⚡
+            Created by Muhammad Iqbal Rasyid 👨🏻‍💻
+          </motion.a>
+
+          {/* Logos & Appreciation Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.6 }}
+            className="mt-12"
+          >
+            <div className="flex flex-col md:flex-row items-center justify-center gap-12">
+              {/* Col1 */}
+              <motion.div
+                className="flex flex-col items-center gap-2"
+                whileHover={{ scale: 1.05, y: -2 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <span className="text-white/70 text-sm font-medium">
+                  Program by:
+                </span>
+                <a
+                  href="https://www.instagram.com/hacktiv8id/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                  <img
+                    src="/Logo_Hactiv8.png"
+                    alt=""
+                    className="h-20 w-full"
+                  />
+                </a>
+                <span className="text-white/90 text-sm font-semibold">
+                  Hactiv8
+                </span>
+              </motion.div>
+
+              {/* Col2 */}
+              <motion.div
+                className="flex flex-col items-center gap-2"
+                whileHover={{ scale: 1.05, y: -2 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <span className="text-white/70 text-sm font-medium">
+                  Collaborated with:
+                </span>
+                <a
+                  href="https://skills.yourlearning.ibm.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+
+                <img src="/Logo_IBM.png" alt="" className="h-20 w-auto" />
+                </a>
+                <span className="text-white/90 text-sm font-semibold">IBM SkillsBuild</span>
+              </motion.div>
+
+              {/* Col3 */}
+              <motion.div
+                className="flex flex-col items-center gap-2"
+                whileHover={{ scale: 1.05, y: -2 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <span className="text-white/70 text-sm font-medium">
+                  AI Powered by:
+                </span>
+                <a
+                  href="https://replicate.com/ibm-granite/granite-3.3-8b-instruct"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                  <img
+                    src="/Logo_Granite.png"
+                    alt=""
+                    className="h-20 w-auto"
+                  />
+                </a>
+                <span className="text-white/90 text-sm font-semibold">
+                  Granite 3.3-8b
+                </span>
+              </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       </footer>
