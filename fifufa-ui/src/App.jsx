@@ -152,13 +152,30 @@ function App() {
     }
   };
 
+  // Updated color palette
+  const colors = {
+    navy: "#1E3A8A",
+    skyBlue: "#38BDF8",
+    emerald: "#10B981",
+    amber: "#F59E0B",
+    watermelon: "#e54f6d",
+    white: "#F9F9F9",
+  };
+
   const floatingElements = Array.from({ length: 8 }, (_, i) => (
     <motion.div
       key={i}
-      className="absolute w-2 h-2 bg-yellow-400 rounded-full opacity-20"
+      className="absolute w-2 h-2 rounded-full opacity-20"
       style={{
         left: `${Math.random() * 100}%`,
         top: `${Math.random() * 100}%`,
+        backgroundColor: [
+          colors.navy,
+          colors.skyBlue,
+          colors.emerald,
+          colors.amber,
+          colors.watermelon,
+        ][i % 5],
       }}
       animate={{
         y: [-20, 20, -20],
@@ -173,27 +190,29 @@ function App() {
     />
   ));
 
-  const colors = { primary: "#514FC2", yellow: "#FFD93D", white: "#F9F9F9" };
-
   return (
     <div
       className="min-h-screen min-w-screen relative overflow-hidden font-sans"
       style={{
-        background:
-          "linear-gradient(135deg, #514FC2 0%, #6366f1 50%, #7c3aed 100%)",
+        background: "white",
+        backgroundImage: `
+          linear-gradient(rgba(30, 58, 138, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(30, 58, 138, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: "20px 20px",
       }}
     >
       <div className="absolute inset-0 pointer-events-none">
         {floatingElements}
         <motion.div
           className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-10"
-          style={{ backgroundColor: colors.yellow }}
+          style={{ backgroundColor: colors.amber }}
           animate={{ rotate: 360, scale: [1, 1.1, 1] }}
           transition={{ duration: 20, repeat: Infinity }}
         />
         <motion.div
           className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full opacity-10"
-          style={{ backgroundColor: colors.yellow }}
+          style={{ backgroundColor: colors.emerald }}
           animate={{ rotate: -360, scale: [1, 1.2, 1] }}
           transition={{ duration: 25, repeat: Infinity }}
         />
@@ -206,8 +225,11 @@ function App() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <motion.h1
-            className="text-4xl sm:text-5xl md:text-6xl font-black mb-3 text-white tracking-tight"
-            style={{ textShadow: "0 4px 20px rgba(0,0,0,0.3)" }}
+            className="text-4xl sm:text-5xl md:text-6xl font-black mb-3 tracking-tight"
+            style={{
+              color: colors.navy,
+              textShadow: "0 2px 10px rgba(30, 58, 138, 0.2)",
+            }}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
@@ -216,9 +238,9 @@ function App() {
           <motion.div
             className="inline-block px-6 py-2 rounded-full text-lg font-semibold"
             style={{
-              backgroundColor: colors.yellow,
-              color: colors.primary,
-              boxShadow: `0 4px 15px ${colors.yellow}4D`,
+              backgroundColor: colors.navy,
+              color: colors.skyBlue,
+              boxShadow: `0 4px 15px ${colors.navy}4D`,
             }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -237,17 +259,16 @@ function App() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <div
-            className="rounded-3xl p-8 shadow-2xl backdrop-blur-sm border border-white border-opacity-10"
+            className="rounded-3xl p-8 shadow-2xl backdrop-blur-sm border border-gray-200"
             style={{
               backgroundColor: colors.white,
-              boxShadow:
-                "0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1)",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
             }}
           >
             <motion.div className="mb-6">
               <label
                 className="block text-sm font-semibold mb-3"
-                style={{ color: colors.primary }}
+                style={{ color: colors.navy }}
                 htmlFor="topic-input"
               >
                 What's on your mind? 🤔
@@ -258,7 +279,8 @@ function App() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-3 p-3 rounded-xl text-sm font-medium text-red-600 bg-red-50 border border-red-200"
+                  className="mb-3 p-3 rounded-xl text-sm font-medium text-white"
+                  style={{ backgroundColor: colors.watermelon }}
                   role="alert"
                   aria-live="polite"
                 >
@@ -277,15 +299,15 @@ function App() {
                   onKeyPress={handleKeyPress}
                   className="w-full border-2 rounded-2xl p-4 pr-16 text-lg font-medium transition-all duration-300 focus:ring-0 outline-none placeholder-gray-400"
                   style={{
-                    borderColor: error ? "#ef4444" : "#e5e7eb",
+                    borderColor: error ? colors.watermelon : "#e5e7eb",
                     backgroundColor: "white",
                     color: "#1f2937",
                   }}
                   whileFocus={{
-                    borderColor: error ? "#ef4444" : colors.primary,
+                    borderColor: error ? colors.watermelon : colors.navy,
                     scale: 1.02,
                     boxShadow: `0 0 0 4px ${
-                      error ? "#ef4444" : colors.primary
+                      error ? colors.watermelon : colors.navy
                     }1A`,
                   }}
                   transition={{ duration: 0.2 }}
@@ -305,8 +327,8 @@ function App() {
                     backgroundColor: loadingRandomWord
                       ? "#f3f4f6"
                       : "transparent",
-                    color: colors.primary,
-                    borderColor: colors.primary,
+                    color: colors.amber,
+                    borderColor: colors.amber,
                   }}
                   title="Get random topic"
                   aria-label="Generate random topic"
@@ -342,16 +364,16 @@ function App() {
               disabled={loading || !topic.trim()}
               className="w-full font-bold py-4 px-6 rounded-2xl text-lg transition-all duration-300 relative overflow-hidden disabled:opacity-70"
               style={{
-                backgroundColor: colors.primary,
+                backgroundColor: colors.watermelon,
                 color: "white",
-                boxShadow: `0 8px 25px ${colors.primary}66`,
+                boxShadow: `0 8px 25px ${colors.watermelon}66`,
               }}
               aria-describedby="main-button-status"
               type="button"
             >
               <motion.div
                 className="absolute inset-0 opacity-0"
-                style={{ backgroundColor: colors.yellow }}
+                style={{ backgroundColor: colors.amber }}
                 whileHover={{ opacity: 0.1 }}
                 transition={{ duration: 0.3 }}
               />
@@ -366,7 +388,7 @@ function App() {
                         ease: "linear",
                       }}
                     >
-                      𖦹
+                      ⭐
                     </motion.div>
                     Generating Magic...
                   </motion.div>
@@ -381,22 +403,22 @@ function App() {
         <AnimatePresence>
           {facts.length > 0 && (
             <motion.div
-              className="w-[100%] md:w-[95%] xl:w-[60%]"
+              className="w-[100%] md:w-[95%] xl:w-[60%] mt-5 overflow-hidden"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.5 }}
             >
               <div
-                className="rounded-3xl p-8 shadow-2xl backdrop-blur-sm border border-white border-opacity-10"
+                className="rounded-3xl p-8 shadow-2xl backdrop-blur-sm border border-gray-200"
                 style={{
                   backgroundColor: colors.white,
-                  boxShadow: "0 25px 50px rgba(0,0,0,0.2)",
+                  boxShadow: "0 25px 50px rgba(0,0,0,0.1)",
                 }}
               >
                 <motion.h2
                   className="text-2xl sm:text-2xl md:text-xl font-bold mb-6 text-center"
-                  style={{ color: colors.primary }}
+                  style={{ color: colors.navy }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
@@ -410,8 +432,13 @@ function App() {
                       className="group p-5 rounded-2xl transition-all duration-300 hover:shadow-lg border-l-4"
                       style={{
                         backgroundColor: "white",
-                        borderLeftColor:
-                          idx % 2 === 0 ? colors.primary : colors.yellow,
+                        borderLeftColor: [
+                          colors.navy,
+                          colors.skyBlue,
+                          colors.emerald,
+                          colors.amber,
+                          colors.watermelon,
+                        ][idx % 5],
                       }}
                       initial={{ opacity: 0, x: -30 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -420,11 +447,16 @@ function App() {
                     >
                       <div className="flex items-start gap-4">
                         <motion.div
-                          className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                          className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm"
                           style={{
-                            backgroundColor:
-                              idx % 2 === 0 ? colors.primary : colors.yellow,
-                            color: idx % 2 === 0 ? "white" : colors.primary,
+                            backgroundColor: [
+                              colors.navy,
+                              colors.skyBlue,
+                              colors.emerald,
+                              colors.amber,
+                              colors.watermelon,
+                            ][idx % 5],
+                            color: "white",
                           }}
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
@@ -460,15 +492,15 @@ function App() {
                       className="font-bold py-3 px-8 rounded-2xl text-base transition-all duration-300 relative overflow-hidden disabled:opacity-70 border-2"
                       style={{
                         backgroundColor: "transparent",
-                        color: colors.primary,
-                        borderColor: colors.primary,
+                        color: colors.skyBlue,
+                        borderColor: colors.skyBlue,
                       }}
                       aria-label="Load 5 more facts"
                       type="button"
                     >
                       <motion.div
                         className="absolute inset-0 opacity-0"
-                        style={{ backgroundColor: colors.primary }}
+                        style={{ backgroundColor: colors.skyBlue }}
                         whileHover={{ opacity: 0.1 }}
                         transition={{ duration: 0.3 }}
                       />
@@ -500,9 +532,16 @@ function App() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1 }}
-                  className="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200"
+                  className="mt-6 p-4 rounded-xl border"
+                  style={{
+                    backgroundColor: `${colors.amber}20`,
+                    borderColor: `${colors.amber}40`,
+                  }}
                 >
-                  <p className="text-sm text-amber-800 text-center font-medium">
+                  <p
+                    className="text-sm text-center font-medium"
+                    style={{ color: colors.navy }}
+                  >
                     ⚠️ AI-generated content may not be 100% accurate. Please
                     verify facts.
                   </p>
@@ -527,14 +566,14 @@ function App() {
             rel="noopener noreferrer"
             className="inline-block px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer"
             style={{
-              backgroundColor: colors.yellow,
-              color: colors.primary,
-              boxShadow: `0 4px 15px ${colors.yellow}33`,
+              backgroundColor: colors.emerald,
+              color: "white",
+              boxShadow: `0 4px 15px ${colors.emerald}33`,
             }}
             whileHover={{
               scale: 1.1,
               y: -2,
-              boxShadow: `0 6px 20px ${colors.yellow}4D`,
+              boxShadow: `0 6px 20px ${colors.emerald}4D`,
             }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400 }}
@@ -556,22 +595,29 @@ function App() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <span className="text-white/70 text-sm font-medium">
+                <span
+                  style={{ color: colors.navy }}
+                  className="text-sm font-medium"
+                >
                   Program by:
                 </span>
                 <a
                   href="https://www.instagram.com/hacktiv8id/"
-                  target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
-                  <img
-                    src="/Logo_Hactiv8.png"
-                    alt=""
-                    className="h-20 w-full"
-                  />
+                  <div className="h-20 w-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <img
+                      src="/Logo_Hactiv8.png"
+                      alt=""
+                      className="h-20 w-full"
+                    />
+                  </div>
                 </a>
-                <span className="text-white/90 text-sm font-semibold">
+                <span
+                  style={{ color: colors.navy }}
+                  className="text-sm font-semibold"
+                >
                   Hactiv8
                 </span>
               </motion.div>
@@ -582,7 +628,10 @@ function App() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <span className="text-white/70 text-sm font-medium">
+                <span
+                  style={{ color: colors.navy }}
+                  className="text-sm font-medium"
+                >
                   Collaborated with:
                 </span>
                 <a
@@ -591,10 +640,16 @@ function App() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
-
-                <img src="/Logo_IBM.png" alt="" className="h-20 w-auto" />
+                  <div className="h-20 w-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <img src="/Logo_IBM2.png" alt="" className="w-25" />
+                  </div>
                 </a>
-                <span className="text-white/90 text-sm font-semibold">IBM SkillsBuild</span>
+                <span
+                  style={{ color: colors.navy }}
+                  className="text-sm font-semibold"
+                >
+                  IBM SkillsBuild
+                </span>
               </motion.div>
 
               {/* Col3 */}
@@ -603,7 +658,10 @@ function App() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <span className="text-white/70 text-sm font-medium">
+                <span
+                  style={{ color: colors.navy }}
+                  className="text-sm font-medium"
+                >
                   AI Powered by:
                 </span>
                 <a
@@ -612,13 +670,17 @@ function App() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
-                  <img
-                    src="/Logo_Granite.png"
-                    alt=""
-                    className="h-20 w-auto"
-                  />
+                  <div className="h-20 w-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <img
+                      src="/Logo_Granite.png"
+                      alt=""
+                    />
+                  </div>
                 </a>
-                <span className="text-white/90 text-sm font-semibold">
+                <span
+                  style={{ color: colors.navy }}
+                  className="text-sm font-semibold"
+                >
                   Granite 3.3-8b
                 </span>
               </motion.div>

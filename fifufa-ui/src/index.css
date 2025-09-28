@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  font-family: 'Times New Roman', Times, serif;
+  --color-navy: #1e3a8a;
+  --color-sky-blue: #38bdf8;
+  --color-emerald: #10b981;
+  --color-amber: #f59e0b;
+  --color-watermelon: #e54f6d;
+  
+  font-family: "Times New Roman", Times, serif;
   line-height: 1.5;
   font-weight: 400;
+
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
