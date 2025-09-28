@@ -6,7 +6,7 @@
   --color-emerald: #10b981;
   --color-amber: #f59e0b;
   --color-watermelon: #e54f6d;
-  
+
   font-family: "Times New Roman", Times, serif;
   line-height: 1.5;
   font-weight: 400;
@@ -37,6 +37,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 h1 {

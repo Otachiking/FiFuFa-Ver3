@@ -408,7 +408,7 @@ function App() {
         <AnimatePresence>
           {facts.length > 0 && (
             <motion.div
-              className="w-[100%] md:w-[85%] lg:w-[65%] xl:w-[60%] mt-5 max-w-screen relative"
+              className="w-[100%] md:w-[95%] xl:w-[60%] mt-5 max-w-screen relative"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -30 }}
@@ -604,7 +604,7 @@ function App() {
                   style={{ color: colors.navy }}
                   className="text-sm font-medium"
                 >
-                  Hosted by:
+                  Program of:
                 </span>
                 <a
                   href="https://www.instagram.com/hacktiv8id/"
